@@ -73,15 +73,11 @@ export default {
   methods: {
     getEarnings(){
       axios.get(`http://localhost:3000/api/v1/users/${auth.getCredentials()}/earnings`).then((res) => {
-        if (res.status === 204) {
-          this.message = 'Você ainda não cadastrou nenhum ganho';
-        }else {
-          res.data.data.forEach(item => {
-            if (!this.earnings.some(earning => item.id === earning.id)) {
-              this.earnings.push(item);
-            };
-          });
-        }
+        res.data.data.forEach(item => {
+          if (!this.earnings.some(earning => item.id === earning.id)) {
+            this.earnings.push(item);
+          };
+        });
       })
     },
     seeDetails(earning) {

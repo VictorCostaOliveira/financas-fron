@@ -14,6 +14,7 @@
 </template>
 <script>
 import axios from 'axios'
+import auth from '@/api/auth'
 export default {
   name: 'SignUp',
   data(){
@@ -41,7 +42,6 @@ export default {
       let userData = {name: this.name, email: this.email, password: this.password};
       axios.post('http://localhost:3000/api/v1/users', {user: userData})
       .then((response) => {
-          debugger
         if (response.data.status === 201) {
           auth.saveCredentials(response.data.data.user.id);
           this.$router.push('/home');

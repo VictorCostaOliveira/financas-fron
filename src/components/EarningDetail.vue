@@ -70,7 +70,7 @@ export default {
     },
     deleteEarning() {
       axios.delete(`http://localhost:3000/api/v1/users/${auth.getCredentials()}/earnings/${this.$route.params.id}`).then((res) => {
-        this.$router.replace('/earnings');
+        this.$router.push('/home');
       }).catch((error) => {
         if (!error.response.data.data) {
           this.errorText.push(error.message)
