@@ -8,6 +8,13 @@
 # install dependencies
 npm install
 
+#install axios
+npm install axios
+
+#install Vuetify
+https://vuetifyjs.com/en/getting-started/quick-start
+npm install vuetify --save
+
 # serve with hot reload at localhost:8080
 npm run dev
 
