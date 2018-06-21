@@ -55,76 +55,88 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-alert v-for="(error) in errorText" :key="error.id" :value="error" color="error">
+      {{ error }}
+    </v-alert>
   </v-container>
 </template>
 <script>
 import axios from 'axios';
 import auth from '@/api/auth';
+
 export default {
   name: 'Spendings',
   data() {
     return {
+      select: [],
+      spendings: [],
+      categories: [],
+      dialog: false,
       description: '',
       value: '',
-      select: [],
       message: '',
-      spendings: [],
-      dialog: false,
-      categories: [],
-    }
+      errorText: [],
+    };
   },
   mounted() {
     this.getSpendings();
     this.getCategories();
   },
   methods: {
-    getSpendings(){
+    getSpendings() {
       axios.get(`http://localhost:3000/api/v1/users/${auth.getCredentials()}/spendings`).then((res) => {
         if (res.status === 204) {
           this.message = 'Voce ainda não cadastrou nenhum gasto';
-        } else  {
-          res.data.data.forEach(item => {
+        } else {
+          res.data.data.forEach((item) => {
             if (!this.spendings.some(spending => item.id === spending.id)) {
               this.spendings.push(item);
-            };
+            }
           });
         }
       });
     },
     createSpending() {
-      let categories = []
+      const newCategories = [];
       if (this.select) {
-        this.select.forEach(item => {
-          categories.push({name: item});
+        this.select.forEach((item) => {
+          newCategories.push({ name: item });
         });
       }
-      let spendingData = {value: this.value, description: this.description};
-      axios.post(`http://localhost:3000/api/v1/users/${auth.getCredentials()}/spendings`, {spending: spendingData,  categories: categories}).then((res) => {
-          this.spendings.push(res.data.data.spending);
+      const spendingData = { value: this.value, description: this.description };
+      axios.post(`http://localhost:3000/api/v1/users/${auth.getCredentials()}/spendings`, { spending: spendingData, categories: newCategories }).then((res) => {
+        this.spendings.push(res.data.data.spending);
       }).catch((error) => {
+        if (!error.response.data.data) {
+          this.errorText.push(error.message);
+        } else {
+          error.response.data.data[0].forEach((item) => {
+            this.errorText.push(item);
+          });
+        }
       });
     },
     seeDetails(spending) {
-      this.$router.replace(`/spendings/${spending.id}`)
+      this.$router.replace(`/spendings/${spending.id}`);
     },
     openDialog() {
       this.dialog = true;
     },
     getCategories() {
       axios.get(`http://localhost:3000/api/v1/users/${auth.getCredentials()}/categories`).then((res) => {
-        res.data.data.forEach(item => {
+        res.data.data.forEach((item) => {
           if (!this.categories.some(categorie => item.id === categorie.id)) {
             this.categories.push(item);
-          };
+          }
         });
       });
-    }
+    },
   },
   computed: {
     items() {
-      return this.categories.map(item => item.name)
-    }
-  }
+      return this.categories.map(item => item.name);
+    },
+  },
 };
 </script>
 <style></style>

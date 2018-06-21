@@ -20,75 +20,74 @@ const router = new Router({
       name: 'sign-up',
       component: SignUp,
       meta: {
-        needBottom: false
-      }
+        needBottom: false,
+      },
     },
     {
       path: '/login',
       name: 'login',
       component: Login,
       meta: {
-        needBottom: false
-      }
+        needBottom: false,
+      },
     },
     {
       path: '/home',
       name: 'Home',
       component: Home,
       meta: {
-        needBottom: true
-      }
+        needBottom: true,
+      },
     },
     {
       path: '/earnings/:id',
       name: 'EaningsDetail',
       component: EaningsDetail,
       meta: {
-        needBottom: true
-      }
+        needBottom: true,
+      },
     },
     {
       path: '/spendings',
       name: 'Spendings',
       component: Spendings,
       meta: {
-        needBottom: true
-      }
+        needBottom: true,
+      },
     },
     {
       path: '/spendings/:id',
       name: 'SpendingDetail',
       component: SpendingDetail,
       meta: {
-        needBottom: true
-      }
+        needBottom: true,
+      },
     },
     {
       path: '/goals',
       name: 'Goals',
       component: Goals,
       meta: {
-        needBottom: true
-      }
+        needBottom: true,
+      },
     },
     {
       path: '/goals/:id',
       name: 'GoalDetail',
       component: GoalDetail,
       meta: {
-        needBottom: true
-      }
+        needBottom: true,
+      },
     },
   ],
 });
 
 router.beforeEach((to, from, next) => {
-  if (authenticatedRoutes.some((element, index, array) => {
-    return element === to.name
-  }) && !AuthStore.getCredentials()) {
-    next({ path: '/login' })
+  if (authenticatedRoutes.some(element => element === to.name) && !AuthStore.getCredentials()) {
+    next({ path: '/login' });
   }
-  next()
-})
+  next();
+});
 
-export default router
+
+export default router;

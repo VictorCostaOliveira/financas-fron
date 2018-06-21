@@ -22,13 +22,10 @@
   </v-card>
 </template>
 <script>
-import auth from '@/api/auth'
+import auth from '@/api/auth';
+
 export default {
   name: 'BottomNavigation',
-  data() {
-    return {
-    }
-  },
   methods: {
     goToSpendings() {
       this.$router.push('/spendings');
@@ -42,8 +39,8 @@ export default {
     logout() {
       auth.destroyCredentials();
       this.$router.push('/login');
-    }
-  }
+    },
+  },
 };
 </script>
 <style>

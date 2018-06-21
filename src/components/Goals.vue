@@ -26,7 +26,7 @@
         </v-flex>
       </li>
     </ul>
-    <v-alert v-for="(error) in errorText" :value="error" color="error">
+    <v-alert v-for="(error) in errorText" :key="error.id" :value="error" color="error">
       {{ error }}
     </v-alert>
     <v-btn absolute dark fab bot right color="pink" class="float-button" @click="openDialog"  fixed="true">
@@ -64,6 +64,7 @@
 <script>
 import axios from 'axios';
 import auth from '@/api/auth';
+
 export default {
   name: 'Goals',
   data() {
@@ -78,43 +79,40 @@ export default {
       end_date: null,
       message: '',
       errorText: [],
-    }
+    };
   },
   mounted() {
     this.getAllGoals();
   },
-  watch: {
-
-  },
   methods: {
     getAllGoals() {
       axios.get(`http://localhost:3000/api/v1/users/${auth.getCredentials()}/goals`).then((res) => {
-      if (res.status === 204) {
-        if (!this.goals) {
-          this.message = 'Nenhum objetivo foi criado'
+        if (res.status === 204) {
+          if (!this.goals) {
+            this.message = 'Nenhum objetivo foi criado';
+          }
+        } else {
+          res.data.data.forEach((item) => {
+            if (!this.goals.some(goal => item.id === goal.id)) {
+              this.goals.push(item);
+            }
+          });
         }
-      } else {
-        res.data.data.forEach(item => {
-          if (!this.goals.some(goal => item.id === goal.id)) {
-            this.goals.push(item);
-          };
-        });
-      }
       });
     },
     createGoal() {
-      let goalData = {description: this.description, parcel: this.parcel, value: this.value}
-      axios.post(`http://localhost:3000/api/v1/users/${auth.getCredentials()}/goals`, {goal: goalData}).then((res) => {
+      const goalData = { description: this.description, parcel: this.parcel, value: this.value };
+      axios.post(`http://localhost:3000/api/v1/users/${auth.getCredentials()}/goals`, { goal: goalData }).then((res) => {
         this.goals.push(res.data.data.goal);
       }).catch((error) => {
         if (!error.response.data.data) {
           this.errorText.push(error.message);
         } else {
-          error.response.data.data[0].forEach(item => {
+          error.response.data.data[0].forEach((item) => {
             this.errorText.push(item);
           });
         }
-      })
+      });
     },
     openDialog() {
       this.dialog = true;
@@ -122,21 +120,22 @@ export default {
     seeDetails(goal) {
       this.$router.push(`/goals/${goal.id}`);
     },
-    formattedDate(end_date) {
-      var today = new Date(end_date);
-      var day = today.getDate();
-      var month = today.getMonth()+1; //January is 0!
-      var year = today.getFullYear();
-      if(day<10) {
-          day = '0'+day
+    formattedDate(endDate) {
+      const today = new Date(endDate);
+      let day = today.getDate();
+      let month = today.getMonth() + 1; // January is 0!
+      const year = today.getFullYear();
+      if (day < 10) {
+        day = `0${day}`;
       }
 
-      if(month<10) {
-          month = '0'+month
+      if (month < 10) {
+        month = `0${month}`;
       }
-      return day + '/' + month + '/' + year;
-    }
-  }
+
+      return `${day}/${month}/${year}`;
+    },
+  },
 };
 </script>
 <style>

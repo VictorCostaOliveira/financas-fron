@@ -27,7 +27,7 @@
           </v-container>
         </v-card>
       </v-flex>
-      <v-alert v-for="(error) in errorText" :value="error" color="error">
+      <v-alert v-for="(error) in errorText" :key="error.id" :value="error" color="error">
         {{ error }}
       </v-alert>
       <v-alert :value="success" color="success">
@@ -37,8 +37,9 @@
   </v-container>
 </template>
 <script>
-import axios from 'axios'
-import auth from '@/api/auth'
+import axios from 'axios';
+import auth from '@/api/auth';
+
 export default {
   name: 'GoalDetail',
   data() {
@@ -47,7 +48,7 @@ export default {
       errorText: [],
       success: false,
       successMessage: '',
-    }
+    };
   },
   mounted() {
     const self = this;
@@ -57,53 +58,51 @@ export default {
   },
   methods: {
     update() {
-      axios.put(`http://localhost:3000/api/v1/users/${auth.getCredentials()}/goals/${this.$route.params.id}`, {goal: this.goal }).then((res) => {
+      axios.put(`http://localhost:3000/api/v1/users/${auth.getCredentials()}/goals/${this.$route.params.id}`, { goal: this.goal }).then((res) => {
         this.goal = res.data.data.goal;
         this.success = true;
         this.successMessage = 'Gasto atualizado';
-        this.setTimeout(function() {
-          this.success = false;
-        }, 30)
       }).catch((error) => {
         if (!error.response.data.data) {
-          this.errorText.push(error.message)
-        }else  {
-          error.response.data.data[0].forEach(item => {
-            this.errorText.push(item)
+          this.errorText.push(error.message);
+        } else {
+          error.response.data.data[0].forEach((item) => {
+            this.errorText.push(item);
           });
         }
-      })
+      });
     },
     deleteGoal() {
-      axios.delete(`http://localhost:3000/api/v1/users/${auth.getCredentials()}/goals/${this.$route.params.id}`).then((res) => {
+      axios.delete(`http://localhost:3000/api/v1/users/${auth.getCredentials()}/goals/${this.$route.params.id}`).then(() => {
         this.$router.replace('/goals');
       }).catch((error) => {
         if (!error.response.data.data) {
-          this.errorText.push(error.message)
-        }else  {
-          error.response.data.data[0].forEach(item => {
-            this.errorText.push(item)
+          this.errorText.push(error.message);
+        } else {
+          error.response.data.data[0].forEach((item) => {
+            this.errorText.push(item);
           });
         }
-      })
+      });
     },
   },
   computed: {
     formattedDate() {
-      var today = new Date(this.goal.end_date);
-      var day = today.getDate();
-      var month = today.getMonth()+1; //January is 0!
-      var year = today.getFullYear();
-      if(day<10) {
-          day = '0'+day
+      const today = new Date(this.goal.end_date);
+      let day = today.getDate();
+      let month = today.getMonth() + 1; // January is 0!
+      const year = today.getFullYear();
+      if (day < 10) {
+        day = `0${day}`;
       }
 
-      if(month<10) {
-          month = '0'+month
+      if (month < 10) {
+        month = `0${month}`;
       }
-      return day + '/' + month + '/' + year;
-    }
-  }
+
+      return `${day}/${month}/${year}`;
+    },
+  },
 };
 </script>
 <style>

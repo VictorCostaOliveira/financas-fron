@@ -14,13 +14,12 @@
 </template>
 
 <script>
-
 import BottomNavigation from '@/components/BottomNavigation';
-import auth from '@/api/auth';
+
 export default {
   name: 'App',
   components: {
-    BottomNavigation
+    BottomNavigation,
   },
   data() {
     return {

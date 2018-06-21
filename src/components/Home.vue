@@ -51,50 +51,61 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-alert v-for="(error) in errorText" :key="error.id" :value="error" color="error">
+      {{ error }}
+    </v-alert>
   </v-container>
 </template>
 <script >
 import axios from 'axios';
 import auth from '@/api/auth';
+
 export default {
   name: 'Home',
   data() {
     return {
+      earnings: [],
       description: '',
       dialog: false,
-      earnings: [],
       message: '',
       value: '',
-    }
+      errorText: [],
+    };
   },
   mounted() {
     this.getEarnings();
   },
   methods: {
-    getEarnings(){
+    getEarnings() {
       axios.get(`http://localhost:3000/api/v1/users/${auth.getCredentials()}/earnings`).then((res) => {
-        res.data.data.forEach(item => {
+        res.data.data.forEach((item) => {
           if (!this.earnings.some(earning => item.id === earning.id)) {
             this.earnings.push(item);
-          };
+          }
         });
-      })
+      });
     },
     seeDetails(earning) {
-      this.$router.push(`/earnings/${earning.id}`)
+      this.$router.push(`/earnings/${earning.id}`);
     },
     createEarning() {
-      let earningData = {description: this.description, value: this.value}
-      axios.post(`http://localhost:3000/api/v1/users/${auth.getCredentials()}/earnings`, {earning: earningData}).then((res) => {
+      const earningData = { description: this.description, value: this.value };
+      axios.post(`http://localhost:3000/api/v1/users/${auth.getCredentials()}/earnings`, { earning: earningData }).then((res) => {
         this.earnings.push(res.data.data.earning);
       }).catch((error) => {
-        console.log(error.data.data);
+        if (!error.response.data.data) {
+          this.errorText.push(error.message);
+        } else {
+          error.response.data.data[0].forEach((item) => {
+            this.errorText.push(item);
+          });
+        }
       });
     },
     openDialog() {
       this.dialog = true;
-    }
-  }
+    },
+  },
 };
 </script>
 <style >

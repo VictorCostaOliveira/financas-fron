@@ -21,7 +21,7 @@
           </v-container>
         </v-card>
       </v-flex>
-      <v-alert v-for="(error) in errorText" :value="error" color="error">
+      <v-alert v-for="(error) in errorText" :key="error.id" :value="error" color="error">
         {{ error }}
       </v-alert>
       <v-alert :value="success" color="success">
@@ -33,6 +33,7 @@
 <script>
 import axios from 'axios';
 import auth from '@/api/auth';
+
 export default {
   name: 'EarningDetail',
   data() {
@@ -41,7 +42,7 @@ export default {
       errorText: [],
       success: false,
       successMessage: '',
-    }
+    };
   },
   mounted() {
     const self = this;
@@ -51,37 +52,34 @@ export default {
   },
   methods: {
     update() {
-      axios.put(`http://localhost:3000/api/v1/users/${auth.getCredentials()}/earnings/${this.$route.params.id}`, {earning: this.earning }).then((res) => {
+      axios.put(`http://localhost:3000/api/v1/users/${auth.getCredentials()}/earnings/${this.$route.params.id}`, { earning: this.earning }).then((res) => {
         this.earning = res.data.data.earning;
         this.success = true;
         this.successMessage = 'Gasto atualizado';
-        this.setTimeout(function() {
-          this.success = false;
-        }, 30)
       }).catch((error) => {
         if (!error.response.data.data) {
-          this.errorText.push(error.message)
-        }else  {
-          error.response.data.data[0].forEach(item => {
-            this.errorText.push(item)
+          this.errorText.push(error.message);
+        } else {
+          error.response.data.data[0].forEach((item) => {
+            this.errorText.push(item);
           });
         }
-      })
+      });
     },
     deleteEarning() {
-      axios.delete(`http://localhost:3000/api/v1/users/${auth.getCredentials()}/earnings/${this.$route.params.id}`).then((res) => {
+      axios.delete(`http://localhost:3000/api/v1/users/${auth.getCredentials()}/earnings/${this.$route.params.id}`).then(() => {
         this.$router.push('/home');
       }).catch((error) => {
         if (!error.response.data.data) {
-          this.errorText.push(error.message)
-        }else  {
-          error.response.data.data[0].forEach(item => {
-            this.errorText.push(item)
+          this.errorText.push(error.message);
+        } else {
+          error.response.data.data[0].forEach((item) => {
+            this.errorText.push(item);
           });
         }
-      })
+      });
     },
-  }
+  },
 };
 </script>
 <style>

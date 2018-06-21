@@ -13,7 +13,7 @@
                   <v-text-field v-model="spending.value" value="spending.value" label="Quanto vc gastou?" required type="number"></v-text-field>
                 </v-flex>
                 <p class="align">Categorias</p>
-                <v-chip v-for="category in spending.categories" v-if="category">
+                <v-chip v-for="category in spending.categories" :key="category.id" v-if="category">
                   <strong>{{ category.name }}</strong>
                 </v-chip>
                 <strong v-else class="align">Nenhuma categoria foi cadastrada</strong>
@@ -26,7 +26,7 @@
           </v-container>
         </v-card>
       </v-flex>
-      <v-alert v-for="(error) in errorText" :value="error" color="error">
+      <v-alert v-for="(error) in errorText" :key="error.id" :value="error" color="error">
         {{ error }}
       </v-alert>
       <v-alert :value="success" color="success">
@@ -36,8 +36,9 @@
   </v-container>
 </template>
 <script>
-import axios from 'axios'
-import auth from '@/api/auth'
+import axios from 'axios';
+import auth from '@/api/auth';
+
 export default {
   name: 'SpendingDetail',
   data() {
@@ -46,7 +47,7 @@ export default {
       errorText: [],
       success: false,
       successMessage: '',
-    }
+    };
   },
   mounted() {
     const self = this;
@@ -56,37 +57,34 @@ export default {
   },
   methods: {
     update() {
-      axios.put(`http://localhost:3000/api/v1/users/${auth.getCredentials()}/spendings/${this.$route.params.id}`, {spending: this.spending }).then((res) => {
+      axios.put(`http://localhost:3000/api/v1/users/${auth.getCredentials()}/spendings/${this.$route.params.id}`, { spending: this.spending }).then((res) => {
         this.spending = res.data.data.spending;
         this.success = true;
         this.successMessage = 'Gasto atualizado';
-        this.setTimeout(function() {
-          this.success = false;
-        }, 30)
       }).catch((error) => {
         if (!error.response.data.data) {
-          this.errorText.push(error.message)
-        }else  {
-          error.response.data.data[0].forEach(item => {
-            this.errorText.push(item)
+          this.errorText.push(error.message);
+        } else {
+          error.response.data.data[0].forEach((item) => {
+            this.errorText.push(item);
           });
         }
-      })
+      });
     },
     deleteSpending() {
-      axios.delete(`http://localhost:3000/api/v1/users/${auth.getCredentials()}/spendings/${this.$route.params.id}`).then((res) => {
+      axios.delete(`http://localhost:3000/api/v1/users/${auth.getCredentials()}/spendings/${this.$route.params.id}`).then(() => {
         this.$router.replace('/spendings');
       }).catch((error) => {
         if (!error.response.data.data) {
-          this.errorText.push(error.message)
-        }else  {
-          error.response.data.data[0].forEach(item => {
-            this.errorText.push(item)
+          this.errorText.push(error.message);
+        } else {
+          error.response.data.data[0].forEach((item) => {
+            this.errorText.push(item);
           });
         }
-      })
+      });
     },
-  }
+  },
 };
 </script>
 <style>
